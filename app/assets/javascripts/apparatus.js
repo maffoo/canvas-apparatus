@@ -52,6 +52,7 @@ App.Apparatus = Ember.Object.extend({
   // run this apparatus forward by one step
   step: function(drawApparatus, drawFigure) {
     var t = this.incrementProperty('t');
+    this.calculateState();
         
     if (drawApparatus) this.drawApparatus();
     if (drawFigure) this.drawFigure();
@@ -71,7 +72,7 @@ App.Apparatus = Ember.Object.extend({
     points = ['pen', 'j1', 'j2', 'cross', 'penR', 'j1R', 'j2R', 'crossR'];
     for (var i = 0; i < points.length; i++) {
       var attr = points[i] + 'Prev';
-      this[points[i] + 'Prev'] = from.get(points[i]);
+      this[points[i] + 'Prev'] = from[points[i]];
     }
   },
   
@@ -79,10 +80,10 @@ App.Apparatus = Ember.Object.extend({
   drawApparatus: function() {
     var w = appCanvas.width,
         h = appCanvas.height,
-        ctx = appCanvas.getContext("2d");
+        ctx = appCanvas.getContext('2d');
     ctx.clearRect(0, 0, w, h);
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.lineWidth = 2;
     ctx.save();
     ctx.translate(w/2, h/2);
@@ -90,7 +91,7 @@ App.Apparatus = Ember.Object.extend({
     // circles
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "#ff8888";
+    ctx.strokeStyle = '#ff8888';
     ctx.beginPath();
     var c1 = this.get('c1');
     var r1 = this.get('r1');
@@ -98,7 +99,7 @@ App.Apparatus = Ember.Object.extend({
     ctx.arc(c1.x, c1.y, r1, 0, 2*Math.PI, true);
     ctx.stroke();
     
-    ctx.strokeStyle = "#8888ff";
+    ctx.strokeStyle = '#8888ff';
     ctx.beginPath();
     var c2 = this.get('c2');
     var r2 = this.get('r2');
@@ -133,10 +134,10 @@ App.Apparatus = Ember.Object.extend({
     drawLine(ctx, "#0000ff", [c2, a2]);
 
     // apparatus legs
-    var j1 = this.get('j1');
-    var j2 = this.get('j2');
-    var cross = this.get('cross');
-    var pen = this.get('pen');
+    var j1 = this.j1;
+    var j2 = this.j2;
+    var cross = this.cross;
+    var pen = this.pen;
     drawLine(ctx, "#228800", [a1, j1, pen, j2, a2]);
 
     var r = App.get('centerDotRadius');
@@ -153,10 +154,10 @@ App.Apparatus = Ember.Object.extend({
     drawDot(ctx, "black", pen, r);
 
     if (this.get('doubleSided')) {
-      var j1R = this.get('j1R');
-      var j2R = this.get('j2R');
-      var penR = this.get('penR');
-      var crossR = this.get('crossR');
+      var j1R = this.j1R;
+      var j2R = this.j2R;
+      var penR = this.penR;
+      var crossR = this.crossR;
       drawLine(ctx, "#228800", [a1, j1R, penR, j2R, a2]);
             
       drawDot(ctx, "black", crossR, r);
@@ -178,36 +179,36 @@ App.Apparatus = Ember.Object.extend({
   drawFigure: function() {
     var w = drawCanvas.width,
         h = drawCanvas.height,
-        ctx = drawCanvas.getContext("2d");
+        ctx = drawCanvas.getContext('2d');
     ctx.save();
     ctx.translate(w/2, h/2);
-    ctx.lineCap = "round";
+    ctx.lineCap = 'round';
 
     if (this.get('drawLines')) {
       //drawLine(ctx, "#aaaaaa", [this.crossPrev, this.get('cross')]);
       //drawLine(ctx, "#ffaaaa", [this.j1Prev, this.get('j1')]);
       //drawLine(ctx, "#aaaaff", [this.j2Prev, this.get('j2')]);
-      drawLine(ctx, "black", [this.penPrev, this.get('pen')]);
+      drawLine(ctx, 'black', [this.penPrev, this.pen]);
     }
     
     if (this.get('drawDots')) {
-      drawDot(ctx, "black", this.get('pen'), 1);
+      drawDot(ctx, 'black', this.get('pen'), 1);
     }
     ctx.restore();
     
     //if (app.get('doubleSided')) {
-      ctx = drawCanvasR.getContext("2d");
+      ctx = drawCanvasR.getContext('2d');
       ctx.save();
       ctx.translate(w/2, h/2);
-      ctx.lineCap = "round";
+      ctx.lineCap = 'round';
       if (this.get('drawLines')) {
         //drawLine(ctx, "#aaaaaa", [this.crossRPrev, this.get('crossR')]);
         //drawLine(ctx, "#ffaaaa", [this.j1RPrev, this.get('j1R')]);
         //drawLine(ctx, "#aaaaff", [this.j2RPrev, this.get('j2R')]);
-        drawLine(ctx, "black", [this.penRPrev, this.get('penR')]);
+        drawLine(ctx, 'black', [this.penRPrev, this.penR]);
       }
       if (this.get('drawDots')) {
-        drawDot(ctx, "black", this.get('penR'), 1);
+        drawDot(ctx, 'black', this.penR, 1);
       }
       ctx.restore();
     //}
@@ -215,6 +216,7 @@ App.Apparatus = Ember.Object.extend({
   
   redrawFigure: function() {
     obj = this.clone(); // make a clone that is not bound to control panel view
+    obj.calculateState();
     obj.clearFigure();
     var tNow = obj.get('t');
     obj.set('t', Math.max(0, tNow - 1000)); // TODO: calculate max history length instead
@@ -230,9 +232,9 @@ App.Apparatus = Ember.Object.extend({
   // event observers
   visibleChanged: function() {
     if (this.get('visible')) {
-      $("#apparatus").show();
+      $('#apparatus').show();
     } else {
-      $("#apparatus").hide();
+      $('#apparatus').hide();
     }
   }.observes('visible'),
   
@@ -312,172 +314,74 @@ App.Apparatus = Ember.Object.extend({
   }).property('theta0_2', 't', 'rate2').cacheable(),
   
   a1: function() {
-    var c = this.get('c1'),
+    var x = this.get('c1x'),
+        y = this.get('c1y'),
         r = this.get('r1'),
         theta = this.get('theta1');
-    return {x: c.x + r * Math.cos(theta * Math.PI/180),
-            y: c.y + r * Math.sin(theta * Math.PI/180)};
-  }.property('c1', 'r1', 'theta1').cacheable(),
+    return {'x': x + r * Math.cos(theta * Math.PI/180),
+            'y': y + r * Math.sin(theta * Math.PI/180)};
+  }.property('c1x', 'c1y', 'r1', 'theta1').cacheable(),
   
   a2: function() {
-    var c = this.get('c2'),
+    var x = this.get('c2x'),
+        y = this.get('c2y'),
         r = this.get('r2'),
         theta = this.get('theta2');
-    return {x: c.x + r * Math.cos(theta * Math.PI/180),
-            y: c.y + r * Math.sin(theta * Math.PI/180)};
-  }.property('c1', 'r1', 'theta1').cacheable(),
+    return {'x': x + r * Math.cos(theta * Math.PI/180),
+            'y': y + r * Math.sin(theta * Math.PI/180)};
+  }.property('c2x', 'c2y', 'r2', 'theta2').cacheable(),
   
-  //distance between anchors
-  aDist: function() {
-    return dist(this.get('a1'), this.get('a2'));
-  }.property('a1', 'a2').cacheable(),
   
-  aDist2: function() {
-    return this.get('aDist') / 2;
-  }.property('aDist').cacheable(),
   
-  // midpoint between anchors
-  midpoint: function() {
+  // compute machine state
+  calculateState: function() {
     var a1 = this.get('a1');
     var a2 = this.get('a2');
-    return {x: (a1.x + a2.x) / 2,
-            y: (a1.y + a2.y) / 2};
-  }.property('a1', 'a2').cacheable(),
-    
-  // unit vector pointing from anchor 1 to 2
-  perp: function() {
-    var a1 = this.get('a1');
-    var a2 = this.get('a2');
-    var aDist = this.get('aDist');
-    return {x: (a2.x - a1.x) / aDist,
-            y: (a2.y - a1.y) / aDist};
-  }.property('a1', 'a2', 'aDist').cacheable(),
-  
-  // unit vector pointing in the direction of the pen
-  par: function() {
-    var perp = this.get('perp');
-    return {x: perp.y, y: -perp.x};
-  }.property('perp').cacheable(),
-  
-  // distance to crossing point
-  dCross: function() {
-    var leg1 = this.get('leg1');
-    var aDist2 = this.get('aDist2');
-    return Math.sqrt(leg1*leg1 - aDist2*aDist2);
-  }.property('leg1', 'aDist2').cacheable(),
-  
-  // distance to end of leg
-  dLeg: function() {
     var leg1 = this.get('leg1');
     var leg2 = this.get('leg2');
-    var dCross = this.get('dCross');
-    return leg2 * (dCross / leg1);
-  }.property('leg1', 'leg2', 'dCross').cacheable(),
-  
-  // distance between leg ends
-  wLeg: function() {
-    var leg2 = this.get('leg2');
-    var dLeg = this.get('dLeg');
-    return Math.sqrt(leg2*leg2 - dLeg*dLeg);
-  }.property('leg2', 'dLeg').cacheable(),
-  
-  // distance to pen
-  dPen: function() {
     var leg3 = this.get('leg3');
-    var wLeg = this.get('wLeg');
-    return Math.sqrt(leg3*leg3 - wLeg*wLeg);
-  }.property('leg3', 'wLeg').cacheable(),
+    
+    var aDist = dist(a1, a2);
+    var aDist2 = aDist / 2;
+    var dCross = Math.sqrt(leg1*leg1 - aDist2*aDist2);
+    var dLeg = leg2 * (dCross / leg1);
+    var wLeg = Math.sqrt(leg2*leg2 - dLeg*dLeg);
+    var dPen = Math.sqrt(leg3*leg3 - wLeg*wLeg);
+
+    // 
+    var mid = {x: (a1.x + a2.x) / 2,
+               y: (a1.y + a2.y) / 2};
+    var perp = {x: (a2.x - a1.x) / aDist,
+                y: (a2.y - a1.y) / aDist};
+    var par = {x: perp.y, y: -perp.x};
+    
+    //
+    this.pen =    {x: mid.x + par.x * (dCross + dLeg + dPen),
+                   y: mid.y + par.y * (dCross + dLeg + dPen)};
+    this.j1 =     {x: mid.x + par.x * (dCross + dLeg) + perp.x * wLeg,
+                   y: mid.y + par.y * (dCross + dLeg) + perp.y * wLeg};
+    this.j2 =     {x: mid.x + par.x * (dCross + dLeg) - perp.x * wLeg,
+                   y: mid.y + par.y * (dCross + dLeg) - perp.y * wLeg};
+    this.cross =  {x: mid.x + par.x * (dCross),
+                   y: mid.y + par.y * (dCross)};
+    this.penR =   {x: mid.x - par.x * (dCross + dLeg + dPen),
+                   y: mid.y - par.y * (dCross + dLeg + dPen)};
+    this.j1R =    {x: mid.x - par.x * (dCross + dLeg) + perp.x * wLeg,
+                   y: mid.y - par.y * (dCross + dLeg) + perp.y * wLeg};
+    this.j2R =    {x: mid.x - par.x * (dCross + dLeg) - perp.x * wLeg,
+                   y: mid.y - par.y * (dCross + dLeg) - perp.y * wLeg};
+    this.crossR = {x: mid.x - par.x * (dCross),
+                   y: mid.y - par.y * (dCross)};
+  },
   
-  // vertex positions
-  pen: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var dPen = this.get('dPen');
-    return {x: mid.x + par.x * (dCross + dLeg + dPen),
-            y: mid.y + par.y * (dCross + dLeg + dPen)};
-  }.property('midpoint', 'par', 'dCross', 'dLeg', 'dPen').cacheable(),
-  
-  j1: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var perp = this.get('perp');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var wLeg = this.get('wLeg');
-    return {x: mid.x + par.x * (dCross + dLeg) + perp.x * wLeg,
-            y: mid.y + par.y * (dCross + dLeg) + perp.y * wLeg};
-  }.property('midpoint', 'par', 'perp', 'dCross', 'dLeg', 'wLeg').cacheable(),
-  
-  j2: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var perp = this.get('perp');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var wLeg = this.get('wLeg');
-    return {x: mid.x + par.x * (dCross + dLeg) - perp.x * wLeg,
-            y: mid.y + par.y * (dCross + dLeg) - perp.y * wLeg};
-  }.property('midpoint', 'par', 'perp', 'dCross', 'dLeg', 'wLeg').cacheable(),
-  
-  cross: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var dCross = this.get('dCross');
-    return {x: mid.x + par.x * (dCross),
-            y: mid.y + par.y * (dCross)};
-  }.property('midpoint', 'par', 'dCross').cacheable(),
-  
-  penR: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var dPen = this.get('dPen');
-    return {x: mid.x - par.x * (dCross + dLeg + dPen),
-            y: mid.y - par.y * (dCross + dLeg + dPen)};
-  }.property('midpoint', 'par', 'dCross', 'dLeg', 'dPen').cacheable(),
-  
-  j1R: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var perp = this.get('perp');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var wLeg = this.get('wLeg');
-    return {x: mid.x - par.x * (dCross + dLeg) + perp.x * wLeg,
-            y: mid.y - par.y * (dCross + dLeg) + perp.y * wLeg};
-  }.property('midpoint', 'par', 'perp', 'dCross', 'dLeg', 'wLeg').cacheable(),
-  
-  j2R: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var perp = this.get('perp');
-    var dCross = this.get('dCross');
-    var dLeg = this.get('dLeg');
-    var wLeg = this.get('wLeg');
-    return {x: mid.x - par.x * (dCross + dLeg) - perp.x * wLeg,
-            y: mid.y - par.y * (dCross + dLeg) - perp.y * wLeg};
-  }.property('midpoint', 'par', 'perp', 'dCross', 'dLeg', 'wLeg').cacheable(),
-  
-  crossR: function() {
-    var mid = this.get('midpoint');
-    var par = this.get('par');
-    var dCross = this.get('dCross');
-    return {x: mid.x - par.x * (dCross),
-            y: mid.y - par.y * (dCross)};
-  }.property('midpoint', 'par', 'dCross').cacheable(),
   
   rateHandle1: function() {
-    var c = this.get('c1');
-    return {x: c.x - 14, y: c.y};
-  }.property('c1'),
+    return {x: this.get('c1x') - 14, y: this.get('c1y')};
+  }.property('c1x', 'c1y'),
 
   rateHandle2: function() {
-    var c = this.get('c2');
-    return {x: c.x - 14, y: c.y};
-  }.property('c2'),
+    return {x: this.get('c2x') - 14, y: this.get('c2y')};
+  }.property('c2x', 'c2y'),
 
   
   // support for location hashes
@@ -579,6 +483,7 @@ App.apparatus = App.Apparatus.create({
 });
 
 //try to parse location hash
+App.apparatus.calculateState();
 App.apparatus.set('doubleSided', false);
 App.apparatus.parseHash(location.hash);
 App.apparatus.step(true, false);
