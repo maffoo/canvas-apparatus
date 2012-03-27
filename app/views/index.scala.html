@@ -1,0 +1,59 @@
+@main("Drawing Apparatus") {
+  <div id="control-panel">
+    <h1>Canvas Apparatus</h1>
+    by <a href="http://maffoo.net">matthew neeley</a><br>
+    after <a href="http://roberthowsare.com/rational-aesthetics/drawing-apparatus/">robert howsare</a><br>
+    <hr>
+    instructions<br>
+    <b>spacebar</b> = run/pause<br>
+    <b>click+drag</b> = edit<br>
+    <hr>
+    <script type="text/x-handlebars" data-template-name="control-panel">
+      {{#with App.apparatus}}
+        {{#if running}}
+          [running]
+        {{else}}
+          [paused]
+        {{/if}}<br>
+        <br>
+        <a href="reset" title="reset the apparatus to its starting state" {{action "reset" on="click"}}>reset</a><br>
+        <a href="save" title="save this apparatus in your browser history" {{action "bookmark" on="click"}}>save</a><br>
+        <br>
+        <table>
+          <tr><td>c1:</td><td>{{view App.NumField valueBinding="c1y"}}</td></tr>
+          <tr><td>c2:</td><td>{{view App.NumField valueBinding="c2y"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+          
+          <tr><td>r1:</td><td>{{view App.NumField valueBinding="r1"}}</td></tr>
+          <tr><td>r2:</td><td>{{view App.NumField valueBinding="r2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>theta1:</td><td>{{view App.NumField valueBinding="theta0_1"}}</td></tr>
+          <tr><td>theta2:</td><td>{{view App.NumField valueBinding="theta0_2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>rate1:</td><td>{{view App.NumField valueBinding="rate1"}}</td></tr>
+          <tr><td>rate2:</td><td>{{view App.NumField valueBinding="rate2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>leg1:</td><td>{{view App.NumField valueBinding="leg1"}}</td></tr>
+          <tr><td>leg2:</td><td>{{view App.NumField valueBinding="leg2"}}</td></tr>
+          <tr><td>leg3:</td><td>{{view App.NumField valueBinding="leg3"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+        </table>
+        <input type="checkbox" {{bindAttr checked="visible"}} {{action "toggleVisible" on="change"}}/> show apparatus<br>
+        <input type="checkbox" {{bindAttr checked="doubleSided"}} {{action "toggleDoubleSided" on="change"}}/> double-sided<br>
+        <input type="checkbox" {{bindAttr checked="drawLines"}} {{action "toggleDrawLines" on="change"}}/> draw lines<br>
+        <input type="checkbox" {{bindAttr checked="drawDots"}} {{action "toggleDrawDots" on="change"}}/> draw dots<br>
+      {{/with}}
+    </script>
+  </div>
+
+  <div>
+    <canvas id="apparatus" width="100" height="100"></canvas>
+    <canvas id="drawing" width="100" height="100"></canvas>
+    <canvas id="drawing-r" width="100" height="100"></canvas>
+  </div>
+  <script src="@routes.Assets.at("javascripts/apparatus.js")"></script>
+}

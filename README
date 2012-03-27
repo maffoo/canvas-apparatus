@@ -1,0 +1,11 @@
+This is your new Play 2.0 application
+=====================================
+
+This file will be packaged with your application, when using `play dist`.
+
+TODO:
+- detect fast pen motions and subdivide them to make the drawing smooth
+- allow numerical editing of parameters from inside the page
+- save a history of previously-used parameters
+- allow people to share drawings (as parameters or images)
+- "fade out" old drawings
