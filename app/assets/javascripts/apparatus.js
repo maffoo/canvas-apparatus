@@ -594,7 +594,7 @@ App.NumField = Ember.TextField.extend({
 });
 
 // control panel view
-var view = Ember.View.create({
+Ember.View.create({
   templateName: 'control-panel',
   apparatusBinding: 'App.apparatus',
   
@@ -621,10 +621,7 @@ var view = Ember.View.create({
   bookmark: function(event) {
     location.hash = App.apparatus.makeHash();
   }
-});
-
-view.appendTo("#control-panel")
-
+}).appendTo("#control-panel")
 
 // set up canvases to respond to window resize events and trigger initial resize
 $(window).resize(function() {
