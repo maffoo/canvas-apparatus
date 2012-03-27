@@ -4,20 +4,15 @@
     by <a href="http://maffoo.net">matthew neeley</a><br>
     after <a href="http://roberthowsare.com/rational-aesthetics/drawing-apparatus/">robert howsare</a><br>
     <hr>
-    instructions<br>
-    <b>spacebar</b> = run/pause<br>
-    <b>click+drag</b> = edit<br>
+    tip: click+drag dots<br>
+    to change apparatus<br>
     <hr>
     <script type="text/x-handlebars" data-template-name="control-panel">
       {{#with App.apparatus}}
-        {{#if running}}
-          [running]
-        {{else}}
-          [paused]
-        {{/if}}<br>
         <br>
-        <a href="reset" title="reset the apparatus to its starting state" {{action "reset" on="click"}}>reset</a><br>
-        <a href="save" title="save this apparatus in your browser history" {{action "bookmark" on="click"}}>save</a><br>
+        <button title="save this apparatus in your browser history" {{action "bookmark" on="click"}}>save</button>
+        <button title="reset the apparatus to its starting state" {{action "reset" on="click"}}>reset</button>
+        <button title="toggle between running and paused" {{action "toggleRunning" on="click"}}>{{#if running}}pause{{else}}run{{/if}}</button><br>
         <br>
         <table>
           <tr><td>c1:</td><td>{{view App.NumField valueBinding="c1y"}}</td></tr>

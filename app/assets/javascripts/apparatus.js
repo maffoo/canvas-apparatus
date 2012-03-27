@@ -503,6 +503,10 @@ Ember.View.create({
   templateName: 'control-panel',
   apparatusBinding: 'App.apparatus',
   
+  toggleRunning: function(event) {
+    this.get('apparatus').toggleProperty('running');
+  },
+  
   toggleVisible: function(event) {
     this.get('apparatus').toggleProperty('visible');
   },
