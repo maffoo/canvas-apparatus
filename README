@@ -1,10 +1,12 @@
-This is your new Play 2.0 application
+Canvas Apparatus
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+By Matthew Neeley, inspired by Robert Howsare's work "Drawing Apparatus"
+(http://roberthowsare.com/rational-aesthetics/drawing-apparatus/) and
+Bret Victor's talk "Inventing on Principle" (http://vimeo.com/36579366).
 
-TODO:
-- detect fast pen motions and subdivide them to make the drawing smooth
-- "fade out" old drawings
-- optimize to speed up rendering of drawings (maybe render in background workers)
-- "gallery" where users can submit drawings
+My first project using Ember.js (http://emberjs.com) and Play framework 2.0
+(http://www.playframework.org), made while trying to learn a little about
+using these two awesome projects.
+
+See it live at http://canvas-apparatus.herokuapp.com
