@@ -1,50 +1,30 @@
 $(document).ready(function() {
 
-// calculate the distance between two points
-function dist(p1, p2) {
-  var dx = p1.x - p2.x;
-  var dy = p1.y - p2.y;
-  return Math.sqrt(dx*dx + dy*dy);
-}
-
-//draw a line using the given drawing context
-function drawLine(ctx, color, pts) {
-  ctx.strokeStyle = color;
-  ctx.beginPath();
-  for (var i = 0; i < pts.length; i++) {
-    var pt = pts[i];
-    if (i == 0) {
-      ctx.moveTo(pt.x, pt.y);
-    } else {
-      ctx.lineTo(pt.x, pt.y);
-    }
-  }
-  ctx.stroke()
-}
-
-// draw a filled dot
-function drawDot(ctx, color, pt, r) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(pt.x, pt.y, r, 0, 2*Math.PI, true);
-  ctx.closePath();
-  ctx.fill();
-}
-
 // canvases
 var appCanvas = $("#apparatus").get(0);
 var drawCanvas = $("#drawing").get(0);
 var drawCanvasR = $("#drawing-r").get(0);
 
-
+// create ember app
 var App = Ember.Application.create({
   simulationInterval: 5,
   centerDotRadius: 5,
   jointDotRadius: 3,
   dragging: ''
 });
-window.App = App; // make App globally visible
+window.App = App; // make App globally visible, e.g. so views can see it
 
+//a TextField that only updates its value when it is a valid number
+App.NumField = Ember.TextField.extend({
+  _elementValueDidChange: function() {
+    var value = parseFloat(this.$().val());
+    if (!isNaN(value)) {
+      this.set('value', value);
+    }
+  }
+});
+
+// Apparatus class
 App.Apparatus = Ember.Object.extend({
   
   // run this apparatus forward by one step
@@ -321,7 +301,6 @@ App.Apparatus = Ember.Object.extend({
   }.property('c2x', 'c2y', 'r2', 'theta2').cacheable(),
   
   
-  
   // compute machine state
   calculateState: function() {
     var a1 = this.get('a1');
@@ -337,14 +316,14 @@ App.Apparatus = Ember.Object.extend({
     var wLeg = Math.sqrt(leg2*leg2 - dLeg*dLeg);
     var dPen = Math.sqrt(leg3*leg3 - wLeg*wLeg);
 
-    // 
+    // compute midpoint between rotors and unit vectors
     var mid = {x: (a1.x + a2.x) / 2,
                y: (a1.y + a2.y) / 2};
     var perp = {x: (a2.x - a1.x) / aDist,
                 y: (a2.y - a1.y) / aDist};
     var par = {x: perp.y, y: -perp.x};
     
-    //
+    // compute locations of all parts of the machine
     this.pen =    {x: mid.x + par.x * (dCross + dLeg + dPen),
                    y: mid.y + par.y * (dCross + dLeg + dPen)};
     this.j1 =     {x: mid.x + par.x * (dCross + dLeg) + perp.x * wLeg,
@@ -490,18 +469,8 @@ App.apparatus = App.Apparatus.create({
 });
 
 
-// a TextField that only updates its value when it is a valid number
-App.NumField = Ember.TextField.extend({
-  _elementValueDidChange: function() {
-    var value = parseFloat(this.$().val());
-    if (!isNaN(value)) {
-      this.set('value', value);
-    }
-  }
-});
-
 // control panel view
-var controlPanel = Ember.View.create({
+App.controlPanel = Ember.View.create({
   templateName: 'control-panel',
   apparatusBinding: 'App.apparatus',
   
@@ -571,13 +540,6 @@ $("body").keyup(function(event) {
 
 
 // handle clicking and dragging
-function toCanvasPt(event) {
-  return {
-    x: event.pageX - appCanvas.offsetTop - appCanvas.width / 2,
-    y: event.pageY - appCanvas.offsetLeft - appCanvas.height / 2
-  };
-}
-
 $("#apparatus").mousedown(function(event) {
   var app = App.apparatus
   
@@ -739,7 +701,7 @@ App.apparatus.parseHash(location.hash);
 App.apparatus.step(true, false);
 
 // add control panel to page
-controlPanel.appendTo("#control-panel");
+App.controlPanel.appendTo("#control-panel");
 
 // trigger a resize to set up canvases
 $(window).trigger('resize');
@@ -751,5 +713,49 @@ window.setInterval(function() {
     app.step(true, true);
   }
 }, App.get('simulationInterval'));
+
+
+
+
+// Utility methods
+
+// calculate the distance between two points
+function dist(p1, p2) {
+  var dx = p1.x - p2.x;
+  var dy = p1.y - p2.y;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+// draw a line using the given drawing context
+function drawLine(ctx, color, pts) {
+  ctx.strokeStyle = color;
+  ctx.beginPath();
+  for (var i = 0; i < pts.length; i++) {
+    var pt = pts[i];
+    if (i == 0) {
+      ctx.moveTo(pt.x, pt.y);
+    } else {
+      ctx.lineTo(pt.x, pt.y);
+    }
+  }
+  ctx.stroke()
+}
+
+// draw a filled dot
+function drawDot(ctx, color, pt, r) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(pt.x, pt.y, r, 0, 2*Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// convert event coordinates to canvas coordinates
+function toCanvasPt(event) {
+  return {
+    x: event.pageX - appCanvas.offsetTop - appCanvas.width / 2,
+    y: event.pageY - appCanvas.offsetLeft - appCanvas.height / 2
+  };
+}
 
 });
