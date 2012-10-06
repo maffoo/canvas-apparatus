@@ -1,12 +1,8 @@
 Canvas Apparatus
-=====================================
+================
 
-By Matthew Neeley, inspired by Robert Howsare's work "Drawing Apparatus"
-(http://roberthowsare.com/rational-aesthetics/drawing-apparatus/) and
-Bret Victor's talk "Inventing on Principle" (http://vimeo.com/36579366).
+By Matthew Neeley, inspired by Robert Howsare's work "Drawing Apparatus" (http://roberthowsare.com/rational-aesthetics/drawing-apparatus/) and Bret Victor's talk "Inventing on Principle" (http://vimeo.com/36579366).
 
-My first project using Ember.js (http://emberjs.com) and Play framework 2.0
-(http://www.playframework.org), made while trying to learn a little about
-using these two awesome projects.
+My first project using Ember.js (http://emberjs.com) and Play framework 2.0 (http://www.playframework.org), made while trying to learn a little about using these two awesome projects.
 
 See it live at http://canvas-apparatus.herokuapp.com
