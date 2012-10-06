@@ -530,6 +530,7 @@ Ember.View.create({
   }
 }).appendTo("#control-panel");
 
+
 // set up canvases to respond to window resize events and trigger initial resize
 $(window).resize(function() {
   var w = appCanvas.width;
@@ -537,23 +538,14 @@ $(window).resize(function() {
   var wNew = $(window).width();
   var hNew = $(window).height();
   
-  //var appCtx = appCanvas.getContext('2d');
-  //var appImage = appCtx.getImageData(0, 0, w, h);
   appCanvas.width = wNew;
   appCanvas.height = hNew;
-  //appCtx.putImageData(appImage, wNew/2 - w/2, hNew/2 - h/2);
   
-  //var drawCtx = drawCanvas.getContext('2d');
-  //var drawImage = drawCtx.getImageData(0, 0, w, h);
   drawCanvas.width = wNew;
   drawCanvas.height = hNew;
-  //drawCtx.putImageData(drawImage, wNew/2 - w/2, hNew/2 - h/2);
   
-  //var drawCtxR = drawCanvasR.getContext('2d');
-  //var drawImageR = drawCtxR.getImageData(0, 0, w, h);
   drawCanvasR.width = wNew;
   drawCanvasR.height = hNew;
-  //drawCtxR.putImageData(drawImageR, wNew/2 - w/2, hNew/2 - h/2);
   App.apparatus.redrawFigure();
 }).trigger('resize');
 
@@ -615,67 +607,81 @@ $("#apparatus").mousemove(function(event) {
   var app = App.apparatus;
   var dragging = App.get('dragging');
   var updateNeeded = true;
-  if (dragging == 'c1') {
+  
+  switch (dragging) {
+  case 'c1':
     var c1 = toCanvasPt(event);
     c1 = {x: 0*Math.round(c1.x), y: Math.round(c1.y)};
     var c2 = {x: -c1.x, y: -c1.y};
     app.set('c1y', c1.y);
     app.set('c2y', c2.y);
+    break;
     
-  } else if (dragging == 'c2') {
+  case 'c2':
     var c2 = toCanvasPt(event);
     c2 = {x: 0*Math.round(c2.x), y: Math.round(c2.y)};
     var c1 = {x: -c2.x, y: -c2.y};
     app.set('c1y', c1.y);
     app.set('c2y', c2.y);
+    break;
     
-  } else if (dragging == 'a1') {
+  case 'a1':
     var a1 = toCanvasPt(event);
     var c1 = app.get('c1');
     var r1 = Math.round(dist(a1, c1));
     app.set('r1', r1);      
     app.set('theta1', 180/Math.PI * Math.atan2(a1.y - c1.y, a1.x - c1.x));
+    break;
     
-  } else if (dragging == 'a2') {
+  case 'a2':
     var a2 = toCanvasPt(event);
     var c2 = app.get('c2');
     var r2 = Math.round(dist(a2, c2));
     app.set('r2', r2);
     app.set('theta2', 180/Math.PI * Math.atan2(a2.y - c2.y, a2.x - c2.x));
+    break;
     
-  } else if (dragging == 'cross') {
+  case 'cross':
     var cross = toCanvasPt(event);
     app.set('leg1', Math.round(dist(app.get('a1'), cross)));
+    break;
     
-  } else if (dragging == 'j1') {
+  case 'j1':
     var j1 = toCanvasPt(event);
     app.set('leg2', Math.round(dist(app.get('cross'), j1)));
+    break;
     
-  } else if (dragging == 'j2') {
+  case 'j2':
     var j2 = toCanvasPt(event);
     app.set('leg2', Math.round(dist(app.get('cross'), j2)));
+    break;
     
-  } else if (dragging == 'pen') {
+  case 'pen':
     var pen = toCanvasPt(event);
     app.set('leg3', Math.round(dist(app.get('j1'), pen)));
+    break;
     
-  } else if (dragging == 'crossR') {
+  case 'crossR':
     var cross = toCanvasPt(event);
     app.set('leg1', Math.round(dist(app.get('a1'), cross)));
+    break;
     
-  } else if (dragging == 'j1R') {
+  case 'j1R':
     var j1 = toCanvasPt(event);
     app.set('leg2', Math.round(dist(app.get('crossR'), j1)));
+    break;
     
-  } else if (dragging == 'j2R') {
+  case 'j2R':
     var j2 = toCanvasPt(event);
     app.set('leg2', Math.round(dist(app.get('crossR'), j2)));
+    break;
     
-  } else if (dragging == 'penR') {
+  case 'penR':
     var pen = toCanvasPt(event);
     app.set('leg3', Math.round(dist(app.get('j1R'), pen)));
+    break;
     
-  } else if (dragging == 'rateHandle1') {
+  case 'rateHandle1':
     var p = toCanvasPt(event);
     var dy = app.lastDragY - p.y;
     var y = app.get('rate1');
@@ -685,8 +691,9 @@ $("#apparatus").mousemove(function(event) {
       if (dy < 0) y = -1;
     }
     app.set('rate1', y);
+    break;
     
-  } else if (dragging == 'rateHandle2') {
+  case 'rateHandle2':
     var p = toCanvasPt(event);
     var dy = app.lastDragY - p.y;
     var y = app.get('rate2');
@@ -696,10 +703,12 @@ $("#apparatus").mousemove(function(event) {
       if (dy < 0) y = -1;
     }
     app.set('rate2', y);
+    break;
     
-  } else {
+  default:
     updateNeeded = false;
   }
+  
   if (updateNeeded) {
     app.redrawFigure();
     var p = toCanvasPt(event);
