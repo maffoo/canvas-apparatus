@@ -1,7 +1,12 @@
+/.settings
+/.cache
+/.classpath
+/.project
+/test
+.history
+dist/.settings
 logs
 project/project
 project/target
 target
 tmp
-.history
-dist
