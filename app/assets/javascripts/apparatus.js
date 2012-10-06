@@ -384,49 +384,64 @@ App.Apparatus = Ember.Object.extend({
   
   // support for location hashes
   makeHash: function() {
-    return "c1=" + this.get('c1y')
-        + "&c2=" + this.get('c2y')
-        + "&r1=" + this.get('r1')
-        + "&r2=" + this.get('r2')
-        + "&t1=" + this.get('theta0_1')
-        + "&t2=" + this.get('theta0_2')
-        + "&s1=" + this.get('rate1')
-        + "&s2=" + this.get('rate2')
-        + "&l1=" + this.get('leg1')
-        + "&l2=" + this.get('leg2')
-        + "&l3=" + this.get('leg3')
-        + "&sa=" + (this.get('visible') ? 1 : 0)
-        + "&ds=" + (this.get('doubleSided') ? 1 : 0)
-        + "&dl=" + (this.get('drawLines') ? 1 : 0)
-        + "&dd=" + (this.get('drawDots') ? 1 : 0);
+    return 'c1=' + this.get('c1y')
+        + '&c2=' + this.get('c2y')
+        + '&r1=' + this.get('r1')
+        + '&r2=' + this.get('r2')
+        + '&t1=' + this.get('theta0_1')
+        + '&t2=' + this.get('theta0_2')
+        + '&s1=' + this.get('rate1')
+        + '&s2=' + this.get('rate2')
+        + '&l1=' + this.get('leg1')
+        + '&l2=' + this.get('leg2')
+        + '&l3=' + this.get('leg3')
+        + '&sa=' + (this.get('visible') ? 1 : 0)
+        + '&ds=' + (this.get('doubleSided') ? 1 : 0)
+        + '&dl=' + (this.get('drawLines') ? 1 : 0)
+        + '&dd=' + (this.get('drawDots') ? 1 : 0);
   },
   
   parseHash: function(hash) {
     try {
-      var allowedKeys = ["c1", "c2", "r1", "r2", "t1", "t2", "s1", "s2", "l1", "l2", "l3", "sa", "ds", "dl", "dd"];
+      var allowedKeys = {
+        'c1': 'c1y',
+        'c2': 'c2y',
+        'r1': 'r1',
+        'r2': 'r2',
+        't1': 'theta0_1',
+        't2': 'theta0_2',
+        's1': 'rate1',
+        's2': 'rate2',
+        'l1': 'leg1',
+        'l2': 'leg2',
+        'l3': 'leg3',
+        'sa': 'visible',
+        'ds': 'doubleSided',
+        'dl': 'drawLines',
+        'dd': 'drawDots'
+      };
+      var isBoolean = {
+        'visible': true,
+        'doubleSided': true,
+        'drawLines': true,
+        'drawDots': true
+      };
       var elems = hash.substring(1).split('&');
       var changed = false;
       for (var i = 0; i < elems.length; i++) {
         var keyVal = elems[i].split('=');
-        if (keyVal.length == 2 && $.inArray(keyVal[0], allowedKeys) >= 0) {
+        if (keyVal.length == 2 && allowedKeys.hasOwnProperty(keyVal[0])) {
           var key = keyVal[0];
           var value = parseFloat(keyVal[1]);
           if (isNaN(value)) continue;
-          if (key == 'c1' && this.get('c1y') != value) { this.set('c1y', value); changed = true; }
-          if (key == 'c2' && this.get('c2y') != value) { this.set('c2y', value); changed = true; }
-          if (key == 'r1' && this.get('r1') != value) { this.set('r1', value); changed = true; }
-          if (key == 'r2' && this.get('r2') != value) { this.set('r2', value); changed = true; }
-          if (key == 't1' && this.get('theta0_1') != value) { this.set('theta0_1', value); changed = true; }
-          if (key == 't2' && this.get('theta0_2') != value) { this.set('theta0_2', value); changed = true; }
-          if (key == 's1' && this.get('rate1') != value) { this.set('rate1', value); changed = true; }
-          if (key == 's2' && this.get('rate2') != value) { this.set('rate2', value); changed = true; }
-          if (key == 'l1' && this.get('leg1') != value) { this.set('leg1', value); changed = true; }
-          if (key == 'l2' && this.get('leg2') != value) { this.set('leg2', value); changed = true; }
-          if (key == 'l3' && this.get('leg3') != value) { this.set('leg3', value); changed = true; }
-          if (key == 'sa' && this.get('visible') != (value != 0)) { this.set('visible', value != 0); changed = true; }
-          if (key == 'ds' && this.get('doubleSided') != (value != 0)) { this.set('doubleSided', value != 0); changed = true; }
-          if (key == 'dl' && this.get('drawLines') != (value != 0)) { this.set('drawLines', value != 0); changed = true; }
-          if (key == 'dd' && this.get('drawDots') != (value != 0)) { this.set('drawDots', value != 0); changed = true; }
+          var prop = allowedKeys[key];
+          if (isBoolean[prop]) {
+            value = value != 0;
+          }
+          if (this.get(prop) != value) {
+            this.set(prop, value);
+            changed = true;
+          }
         }
       }
       if (changed) this.reset();
@@ -439,8 +454,11 @@ App.Apparatus = Ember.Object.extend({
   // create a clone of this apparatus
   clone: function() {
     var params = {};
-    var props = ['visible', 'doubleSided', 'running', 'drawLines', 'drawDots',
-                 'c1x', 'c1y', 'c2x', 'c2y', 'r1', 'r2', 'theta0_1', 'theta0_2', 'rate1', 'rate2', 'leg1', 'leg2', 'leg3', 't'];
+    var props = [
+      'visible', 'doubleSided', 'running', 'drawLines', 'drawDots',
+      'c1x', 'c1y', 'c2x', 'c2y', 'r1', 'r2', 'theta0_1', 'theta0_2',
+      'rate1', 'rate2', 'leg1', 'leg2', 'leg3', 't'
+    ];
     for (var i = 0; i < props.length; i++) {
       var prop = props[i];
       params[prop] = this.get(prop);
@@ -579,9 +597,18 @@ $("#apparatus").mousedown(function(event) {
   // check whether the click happened on top of any control points
   var p = toCanvasPt(event);
   
-  var targets = ['c1', 'c2', 'a1', 'a2', 'cross', 'j1', 'j2', 'pen', 'rateHandle1', 'rateHandle2'];    
+  var targets = [
+    'c1', 'c2', 'a1', 'a2',
+    'cross', 'j1', 'j2', 'pen',
+    'rateHandle1', 'rateHandle2'
+  ];    
   if (app.get('doubleSided')) {
-    targets = ['c1', 'c2', 'a1', 'a2', 'cross', 'j1', 'j2', 'pen', 'crossR', 'j1R', 'j2R', 'penR', 'rateHandle1', 'rateHandle2'];
+    targets = [
+      'c1', 'c2', 'a1', 'a2',
+      'cross', 'j1', 'j2', 'pen',
+      'crossR', 'j1R', 'j2R', 'penR',
+      'rateHandle1', 'rateHandle2'
+    ];
   }
   for (var i = 0; i < targets.length; i++) {
     if (10 > dist(p, app.get(targets[i]))) {
