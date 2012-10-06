@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canvas Apparatus</title>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/ember-0.9.8.1.min.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-1178304-47']);
+      _gaq.push(['_setDomainName', 'herokuapp.com']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="control-panel">
+      <h1>Canvas Apparatus</h1>
+      by <a href="http://maffoo.net">matthew neeley</a><br>
+      after <a href="http://roberthowsare.com/rational-aesthetics/drawing-apparatus/">robert howsare</a><br>
+      <hr>
+      tip: click+drag dots<br>
+      to change apparatus<br>
+      <hr>
+      <script type="text/x-handlebars" data-template-name="control-panel">
+      {{#with App.apparatus}}
+        <br>
+        <button title="save this apparatus in your browser history" {{action "bookmark" on="click"}}>save</button>
+        <button title="reset the apparatus to its starting state" {{action "reset" on="click"}}>reset</button>
+        <button title="toggle between running and paused" {{action "toggleRunning" on="click"}}>{{#if running}}pause{{else}}run{{/if}}</button><br>
+        <br>
+        <table>
+          <tr><td>c1:</td><td>{{view App.NumField valueBinding="c1y"}}</td></tr>
+          <tr><td>c2:</td><td>{{view App.NumField valueBinding="c2y"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+          
+          <tr><td>r1:</td><td>{{view App.NumField valueBinding="r1"}}</td></tr>
+          <tr><td>r2:</td><td>{{view App.NumField valueBinding="r2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>theta1:</td><td>{{view App.NumField valueBinding="theta0_1"}}</td></tr>
+          <tr><td>theta2:</td><td>{{view App.NumField valueBinding="theta0_2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>rate1:</td><td>{{view App.NumField valueBinding="rate1"}}</td></tr>
+          <tr><td>rate2:</td><td>{{view App.NumField valueBinding="rate2"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+          <tr><td>leg1:</td><td>{{view App.NumField valueBinding="leg1"}}</td></tr>
+          <tr><td>leg2:</td><td>{{view App.NumField valueBinding="leg2"}}</td></tr>
+          <tr><td>leg3:</td><td>{{view App.NumField valueBinding="leg3"}}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+
+        </table>
+        <input type="checkbox" {{bindAttr checked="visible"}} {{action "toggleVisible" on="change"}}/> show apparatus<br>
+        <input type="checkbox" {{bindAttr checked="doubleSided"}} {{action "toggleDoubleSided" on="change"}}/> double-sided<br>
+        <input type="checkbox" {{bindAttr checked="drawLines"}} {{action "toggleDrawLines" on="change"}}/> draw lines<br>
+        <input type="checkbox" {{bindAttr checked="drawDots"}} {{action "toggleDrawDots" on="change"}}/> draw dots<br>
+      {{/with}}
+      </script>
+    </div>
+  
+    <div>
+      <canvas id="apparatus" width="100" height="100"></canvas>
+      <canvas id="drawing" width="100" height="100"></canvas>
+      <canvas id="drawing-r" width="100" height="100"></canvas>
+    </div>
+    <script src="@routes.Assets.at("javascripts/apparatus.js")"></script>
+  </body>
+</html>
