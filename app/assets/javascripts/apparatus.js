@@ -176,40 +176,31 @@ App.Apparatus = Ember.Object.extend({
   
   drawFigure: function() {
     var w = drawCanvas.width,
-        h = drawCanvas.height,
-        ctx = drawCanvas.getContext('2d');
+        h = drawCanvas.height;
+    
+    var ctx = drawCanvas.getContext('2d');
     ctx.save();
     ctx.translate(w/2, h/2);
     ctx.lineCap = 'round';
-
     if (this.get('drawLines')) {
-      //drawLine(ctx, "#aaaaaa", [this.crossPrev, this.get('cross')]);
-      //drawLine(ctx, "#ffaaaa", [this.j1Prev, this.get('j1')]);
-      //drawLine(ctx, "#aaaaff", [this.j2Prev, this.get('j2')]);
       drawLine(ctx, 'black', [this.penPrev, this.pen]);
     }
-    
     if (this.get('drawDots')) {
       drawDot(ctx, 'black', this.get('pen'), 1);
     }
     ctx.restore();
     
-    //if (app.get('doubleSided')) {
-      ctx = drawCanvasR.getContext('2d');
-      ctx.save();
-      ctx.translate(w/2, h/2);
-      ctx.lineCap = 'round';
-      if (this.get('drawLines')) {
-        //drawLine(ctx, "#aaaaaa", [this.crossRPrev, this.get('crossR')]);
-        //drawLine(ctx, "#ffaaaa", [this.j1RPrev, this.get('j1R')]);
-        //drawLine(ctx, "#aaaaff", [this.j2RPrev, this.get('j2R')]);
-        drawLine(ctx, 'black', [this.penRPrev, this.penR]);
-      }
-      if (this.get('drawDots')) {
-        drawDot(ctx, 'black', this.penR, 1);
-      }
-      ctx.restore();
-    //}
+    ctx = drawCanvasR.getContext('2d');
+    ctx.save();
+    ctx.translate(w/2, h/2);
+    ctx.lineCap = 'round';
+    if (this.get('drawLines')) {
+      drawLine(ctx, 'black', [this.penRPrev, this.penR]);
+    }
+    if (this.get('drawDots')) {
+      drawDot(ctx, 'black', this.penR, 1);
+    }
+    ctx.restore();
   },
   
   redrawFigure: function() {
@@ -498,13 +489,8 @@ App.apparatus = App.Apparatus.create({
   t: 0
 });
 
-//try to parse location hash
-App.apparatus.calculateState();
-App.apparatus.set('doubleSided', false);
-App.apparatus.parseHash(location.hash);
-App.apparatus.step(true, false);
 
-
+// a TextField that only updates its value when it is a valid number
 App.NumField = Ember.TextField.extend({
   _elementValueDidChange: function() {
     var value = parseFloat(this.$().val());
@@ -515,7 +501,7 @@ App.NumField = Ember.TextField.extend({
 });
 
 // control panel view
-Ember.View.create({
+var controlPanel = Ember.View.create({
   templateName: 'control-panel',
   apparatusBinding: 'App.apparatus',
   
@@ -546,7 +532,7 @@ Ember.View.create({
   bookmark: function(event) {
     location.hash = App.apparatus.makeHash();
   }
-}).appendTo("#control-panel");
+});
 
 
 // set up canvases to respond to window resize events and trigger initial resize
@@ -565,8 +551,9 @@ $(window).resize(function() {
   drawCanvasR.width = wNew;
   drawCanvasR.height = hNew;
   App.apparatus.redrawFigure();
-}).trigger('resize');
+});
 
+// parse parameters from the url when the fragment changes
 $(window).bind('hashchange', function() {
   App.apparatus.parseHash(location.hash);
 });
@@ -580,7 +567,7 @@ $("body").keyup(function(event) {
     }
     break;
   }
-})
+});
 
 
 // handle clicking and dragging
@@ -743,6 +730,19 @@ $("#apparatus").mousemove(function(event) {
     app.lastDragY = p.y;
   }
 });
+
+
+// set up apparatus
+App.apparatus.calculateState();
+App.apparatus.set('doubleSided', false);
+App.apparatus.parseHash(location.hash);
+App.apparatus.step(true, false);
+
+// add control panel to page
+controlPanel.appendTo("#control-panel");
+
+// trigger a resize to set up canvases
+$(window).trigger('resize');
 
 // start the machine running
 window.setInterval(function() {
