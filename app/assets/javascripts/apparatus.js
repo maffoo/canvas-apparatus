@@ -39,10 +39,8 @@ var drawCanvasR = $("#drawing-r").get(0);
 
 var App = Ember.Application.create({
   simulationInterval: 5,
-  
   centerDotRadius: 5,
   jointDotRadius: 3,
-  
   dragging: ''
 });
 window.App = App; // make App globally visible
@@ -530,7 +528,7 @@ Ember.View.create({
   bookmark: function(event) {
     location.hash = App.apparatus.makeHash();
   }
-}).appendTo("#control-panel")
+}).appendTo("#control-panel");
 
 // set up canvases to respond to window resize events and trigger initial resize
 $(window).resize(function() {
